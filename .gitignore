@@ -1,0 +1,53 @@
+# Client dependencies
+/client/node_modules/
+/client/.pnp
+/client/.pnp.*
+/client/.yarn/*
+!/client/.yarn/patches
+!/client/.yarn/plugins
+!/client/.yarn/releases
+!/client/.yarn/versions
+
+# Server dependencies
+/server/node_modules/
+
+# Test coverage
+/client/coverage/
+/server/coverage/
+
+# Next.js build output
+/client/.next/
+/client/out/
+/client/build/
+/client/next-env.d.ts
+
+# Server build output
+/server/build/
+/server/dist/
+
+# Environment files
+/client/.env*
+/server/.env*
+!/client/.env.example
+!/client/.env*.example
+!/server/.env.example
+!/server/.env*.example
+
+# Deployment
+/client/.vercel/
+
+# Debug logs
+/client/npm-debug.log*
+/client/yarn-debug.log*
+/client/yarn-error.log*
+/client/.pnpm-debug.log*
+/server/npm-debug.log*
+/server/yarn-debug.log*
+/server/yarn-error.log*
+/server/.pnpm-debug.log*
+
+# Misc
+.DS_Store
+Thumbs.db
+*.pem
+*.tsbuildinfo
