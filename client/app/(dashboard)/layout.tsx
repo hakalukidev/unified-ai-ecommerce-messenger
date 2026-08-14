@@ -74,7 +74,7 @@ export default function DashboardLayout({
   const isConversationDetail = pathname.startsWith("/conversation/");
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen">
       <aside className="hidden w-64 shrink-0 p-4 md:block">
         <div className="flex h-full flex-col rounded-[30px] border border-[var(--color-line)] bg-[var(--color-surface-strong)] px-4 py-6 shadow-[0_20px_60px_rgba(16,35,58,0.08)]">
           <div className="flex items-center gap-3 px-2">
@@ -151,7 +151,7 @@ export default function DashboardLayout({
         </div>
       </aside>
 
-      <div className="flex min-h-screen flex-1 flex-col">
+      <div className="flex h-screen min-h-0 flex-1 flex-col">
         {isConversationDetail ? null : (
           <header className="px-4 pt-4 md:px-0 md:pr-6 md:pt-6">
             <div className="glass-panel soft-ring flex items-center justify-between gap-3 rounded-[24px] border border-[var(--color-line)] px-4 py-3">

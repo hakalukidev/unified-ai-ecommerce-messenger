@@ -53,9 +53,14 @@ export function ThreadView({
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
+  // Only auto-scroll when the last message actually changes (a new message
+  // arrived or was sent) — not on every background poll, which re-creates
+  // the messages array even when nothing new came in and was yanking the
+  // scroll position back to the bottom while someone was reading up.
+  const lastMessageId = messages.at(-1)?._id;
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [lastMessageId]);
 
   useEffect(() => {
     if (!showSummary) return;
