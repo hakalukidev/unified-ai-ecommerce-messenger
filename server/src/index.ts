@@ -6,6 +6,7 @@ import accountRoutes from "./routes/account.routes";
 import authRoutes from "./routes/auth.routes";
 import conversationRoutes from "./routes/conversation.routes";
 import webhookRoutes from "./routes/webhook.routes";
+import { mediaDir } from "./services/media.service";
 
 dotenv.config();
 
@@ -59,6 +60,10 @@ app.use(express.json());
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
+
+// Publicly served AI voice-reply audio (needs to be fetchable by Meta's
+// servers, so it's served from the same public SERVER_URL/ngrok tunnel).
+app.use("/media", express.static(mediaDir));
 
 app.use("/api/webhooks", webhookRoutes);
 app.use("/api/conversations", conversationRoutes);

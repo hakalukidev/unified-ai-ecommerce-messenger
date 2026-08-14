@@ -4,6 +4,7 @@ import Conversation from "../models/Conversation";
 import Message from "../models/Message";
 import pusher from "../lib/pusher";
 import { normalizeMessage } from "../services/normalize.service";
+import { maybeAutoReply } from "../services/ai-reply.service";
 
 const logWebhook = (
   level: "log" | "warn" | "error",
@@ -366,4 +367,6 @@ async function processIncoming(
     conversationId: conversation.id,
     messageId: message.message_id,
   });
+
+  await maybeAutoReply(conversation, message, accountId);
 }

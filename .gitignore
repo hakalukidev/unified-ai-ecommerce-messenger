@@ -28,6 +28,13 @@
 /server/build/
 /server/dist/
 
+# AI voice-reply audio generated at runtime
+/server/public/media/
+
+# Chatbot service (Python)
+/chatbot/venv/
+/chatbot/__pycache__/
+
 # Environment files
 /client/.env*
 /server/.env*
