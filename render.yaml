@@ -1,0 +1,52 @@
+services:
+  - type: web
+    name: unified-messenger-server
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+      - key: CLIENT_URLS
+        sync: false
+      - key: SERVER_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: VERIFY_TOKEN
+        sync: false
+      - key: META_APP_ID
+        sync: false
+      - key: META_APP_SECRET
+        sync: false
+      - key: META_BUSINESS_CONFIG_ID
+        sync: false
+      - key: META_GRAPH_VERSION
+        value: v25.0
+      - key: PUSHER_APP_ID
+        sync: false
+      - key: PUSHER_KEY
+        sync: false
+      - key: PUSHER_SECRET
+        sync: false
+      - key: PUSHER_CLUSTER
+        sync: false
+      - key: CHATBOT_SERVICE_URL
+        sync: false # fill in after the chatbot service below is created, e.g. https://unified-messenger-chatbot.onrender.com
+
+  - type: web
+    name: unified-messenger-chatbot
+    runtime: python
+    rootDir: chatbot
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn service:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
