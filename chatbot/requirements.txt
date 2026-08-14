@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+python-multipart
+python-dotenv
+langgraph
+langchain-core
+langchain-groq
+groq
+imageio-ffmpeg
