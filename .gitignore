@@ -17,6 +17,9 @@
 
 # Next.js build output
 /client/.next/
+/client/.next-build/
+/client/.next-verify/
+/client/.next-verify-webpack/
 /client/out/
 /client/build/
 /client/next-env.d.ts
