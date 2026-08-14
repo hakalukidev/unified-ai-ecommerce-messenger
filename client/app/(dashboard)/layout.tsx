@@ -69,16 +69,16 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen">
       <aside className="hidden w-64 shrink-0 p-4 md:block">
-        <div className="flex h-full flex-col rounded-[30px] border border-[var(--color-line)] bg-[var(--color-surface-strong)] px-4 py-6 shadow-[0_20px_60px_rgba(16,35,58,0.08)]">
+        <div className="flex h-full flex-col rounded-[30px] border border-[var(--color-sidebar-border)] bg-[var(--color-sidebar)] px-4 py-6 shadow-[0_20px_60px_rgba(16,35,58,0.28)]">
           <div className="flex items-center gap-3 px-2">
             <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--color-accent)] text-white">
               <Bot size={20} />
             </div>
             <div>
-              <h1 className="text-lg font-semibold tracking-tight text-[var(--color-foreground)]">
+              <h1 className="text-lg font-semibold tracking-tight text-white">
                 Khoroch
               </h1>
-              <p className="text-[11px] font-medium text-[var(--color-muted)]">
+              <p className="text-[11px] font-medium text-[var(--color-sidebar-muted)]">
                 Unified Inbox
               </p>
             </div>
@@ -94,8 +94,8 @@ export default function DashboardLayout({
                   href={item.href}
                   className={`flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium transition ${
                     isActive
-                      ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-strong)]"
-                      : "text-[var(--color-muted)] hover:bg-[var(--color-surface-soft)] hover:text-[var(--color-foreground)]"
+                      ? "bg-[var(--color-sidebar-active)] text-white"
+                      : "text-[var(--color-sidebar-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-white"
                   }`}
                 >
                   <item.icon size={18} />
@@ -105,11 +105,11 @@ export default function DashboardLayout({
             })}
           </nav>
 
-          <div className="mt-auto rounded-[22px] border border-[var(--color-line)] bg-[var(--color-surface-soft)] p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-muted)]">
+          <div className="mt-auto rounded-[22px] border border-[var(--color-sidebar-border)] bg-white/5 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-sidebar-muted)]">
               Active seller
             </p>
-            <p className="mt-2 break-all text-sm font-medium text-[var(--color-foreground)]">
+            <p className="mt-2 break-all text-sm font-medium text-white">
               {seller.seller_id}
             </p>
             <button
@@ -118,7 +118,7 @@ export default function DashboardLayout({
                 logout();
                 router.replace("/login");
               }}
-              className="mt-4 inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-muted)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent-strong)]"
+              className="mt-4 inline-flex items-center gap-2 rounded-full border border-[var(--color-sidebar-border)] bg-white/5 px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-sidebar-muted)] transition hover:border-[var(--color-accent)] hover:text-white"
             >
               <LogOut size={14} />
               Log out

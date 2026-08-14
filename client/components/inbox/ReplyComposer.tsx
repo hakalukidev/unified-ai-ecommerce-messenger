@@ -1,7 +1,7 @@
 "use client";
 
 import type { Platform } from "@/types";
-import { Loader2, Paperclip, Send } from "lucide-react";
+import { Loader2, Mic, Paperclip, Send } from "lucide-react";
 import { useLayoutEffect, useRef, useState } from "react";
 
 interface Props {
@@ -57,49 +57,59 @@ export function ReplyComposer({
         </div>
       ) : null}
 
-      <div className="flex items-end gap-2">
-        <button
-          type="button"
-          disabled
-          aria-label="Attach a file (not available yet)"
-          title="Attachment sending is not available in the current backend yet."
-          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[var(--color-line)] bg-white/80 text-[var(--color-muted)] opacity-65"
-        >
-          <Paperclip size={16} />
-        </button>
+      <div className="flex items-end gap-2 rounded-[26px] border border-[var(--color-line)] bg-white px-2.5 py-2 shadow-[0_16px_40px_rgba(16,35,58,0.08)] transition focus-within:border-[var(--color-accent)] focus-within:ring-4 focus-within:ring-[rgba(15,118,110,0.12)]">
+        <textarea
+          ref={textareaRef}
+          value={text}
+          maxLength={maxLength}
+          onChange={(event) => setText(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              void handleSend();
+            }
+          }}
+          rows={1}
+          placeholder="Write your reply..."
+          aria-label="Reply message"
+          className="min-h-9 flex-1 resize-none overflow-y-auto bg-transparent px-2 py-1.5 text-sm leading-6 text-[var(--color-foreground)] outline-none"
+        />
 
-        <div className="relative flex-1">
-          <textarea
-            ref={textareaRef}
-            value={text}
-            maxLength={maxLength}
-            onChange={(event) => setText(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                void handleSend();
-              }
-            }}
-            rows={1}
-            placeholder="Write your reply..."
-            aria-label="Reply message"
-            className="min-h-12 w-full resize-none overflow-y-auto rounded-[22px] border border-[var(--color-line)] bg-white px-4 py-3 pr-4 text-sm leading-6 text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[rgba(15,118,110,0.12)]"
-          />
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            disabled
+            aria-label="Attach a file (not available yet)"
+            title="Attachment sending is not available in the current backend yet."
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[var(--color-muted)] opacity-60"
+          >
+            <Paperclip size={16} />
+          </button>
+
+          <button
+            type="button"
+            disabled
+            aria-label="Record a voice reply (not available yet)"
+            title="Recording and sending a voice reply from the dashboard is not available yet."
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[var(--color-muted)] opacity-60"
+          >
+            <Mic size={16} />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => void handleSend()}
+            disabled={!text.trim() || sending}
+            aria-label="Send reply"
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)] text-white transition hover:bg-[var(--color-accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {sending ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Send size={16} />
+            )}
+          </button>
         </div>
-
-        <button
-          type="button"
-          onClick={() => void handleSend()}
-          disabled={!text.trim() || sending}
-          aria-label="Send reply"
-          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-accent)] text-white transition hover:bg-[var(--color-accent-strong)] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {sending ? (
-            <Loader2 size={16} className="animate-spin" />
-          ) : (
-            <Send size={16} />
-          )}
-        </button>
       </div>
 
       <div className="mt-2 flex items-center justify-between text-[11px] text-[var(--color-muted)]">

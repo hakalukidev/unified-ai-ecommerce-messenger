@@ -2,7 +2,7 @@
 
 import { useConversations } from "@/hooks/useConversations";
 import { conversationService } from "@/services/conversations";
-import { MessageSquareText } from "lucide-react";
+import { AlertTriangle, Mail, MessageSquareText, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { startTransition } from "react";
 import { ConversationList } from "./ConversationList";
@@ -29,6 +29,16 @@ export function InboxWorkspace({ selectedConversationId }: Props) {
     allConversations.find(
       (conversation) => conversation._id === selectedConversationId,
     ) ?? null;
+
+  const unreadCount = allConversations.filter(
+    (conversation) => conversation.unread_count > 0,
+  ).length;
+  const aiHandledCount = allConversations.filter(
+    (conversation) => conversation.ai_enabled,
+  ).length;
+  const escalatedCount = allConversations.filter(
+    (conversation) => conversation.status === "escalated",
+  ).length;
 
   const handleSelectConversation = (conversationId: string) => {
     startTransition(() => {
@@ -106,18 +116,56 @@ export function InboxWorkspace({ selectedConversationId }: Props) {
             </div>
           )
         ) : (
-          <div className="flex flex-1 items-center justify-center px-6 text-center">
-            <div className="max-w-lg">
-              <div className="mx-auto flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-[28px] bg-[var(--color-surface-soft)] text-[var(--color-muted)]">
-                <MessageSquareText size={30} />
+          <div className="flex flex-1 items-center justify-center overflow-y-auto px-6 py-10">
+            <div className="w-full max-w-xl text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent)] text-white shadow-[0_16px_40px_rgba(15,118,110,0.28)]">
+                <MessageSquareText size={26} />
               </div>
               <p className="mt-5 text-2xl font-semibold text-[var(--color-foreground)]">
-                Choose a conversation
+                Hi, there 👋
               </p>
-              <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                Pick a customer thread from the left to open the full message
-                history, reply, toggle AI support, and review the summary panel.
+              <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
+                Pick a conversation on the left, or see what needs attention
+                across your inbox.
               </p>
+
+              <div className="mt-8 grid grid-cols-1 gap-3 text-left sm:grid-cols-3">
+                <div className="rounded-[22px] border border-[var(--color-line)] bg-white/70 p-4">
+                  <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--color-accent-soft)] text-[var(--color-accent-strong)]">
+                    <Mail size={16} />
+                  </div>
+                  <p className="mt-3 text-2xl font-semibold text-[var(--color-foreground)]">
+                    {unreadCount}
+                  </p>
+                  <p className="text-xs font-medium text-[var(--color-muted)]">
+                    Unread conversations
+                  </p>
+                </div>
+
+                <div className="rounded-[22px] border border-[var(--color-line)] bg-white/70 p-4">
+                  <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--color-accent-soft)] text-[var(--color-accent-strong)]">
+                    <Sparkles size={16} />
+                  </div>
+                  <p className="mt-3 text-2xl font-semibold text-[var(--color-foreground)]">
+                    {aiHandledCount}
+                  </p>
+                  <p className="text-xs font-medium text-[var(--color-muted)]">
+                    AI auto-reply is on
+                  </p>
+                </div>
+
+                <div className="rounded-[22px] border border-[var(--color-line)] bg-white/70 p-4">
+                  <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[rgba(234,88,12,0.12)] text-[var(--color-warning)]">
+                    <AlertTriangle size={16} />
+                  </div>
+                  <p className="mt-3 text-2xl font-semibold text-[var(--color-foreground)]">
+                    {escalatedCount}
+                  </p>
+                  <p className="text-xs font-medium text-[var(--color-muted)]">
+                    Escalated, needs you
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}

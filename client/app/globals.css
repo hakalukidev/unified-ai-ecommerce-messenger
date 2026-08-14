@@ -18,6 +18,9 @@
   --success: #059669;
   --sidebar: #10233a;
   --sidebar-muted: rgba(241, 245, 249, 0.72);
+  --sidebar-border: rgba(241, 245, 249, 0.12);
+  --sidebar-hover: rgba(241, 245, 249, 0.08);
+  --sidebar-active: rgba(45, 212, 191, 0.22);
 }
 
 @theme inline {
@@ -36,6 +39,9 @@
   --color-success: var(--success);
   --color-sidebar: var(--sidebar);
   --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-hover: var(--sidebar-hover);
+  --color-sidebar-active: var(--sidebar-active);
   --font-sans: var(--app-font-sans);
   --font-mono: var(--app-font-mono);
 }
