@@ -245,3 +245,43 @@ export const toggleAI = async (
 
   return res.json(updatedConversation);
 };
+
+const allowedStatuses = ["active", "escalated", "resolved"] as const;
+
+export const updateStatus = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  const sellerId = req.user?.sellerId;
+
+  if (!sellerId) {
+    return res.status(401).json({ message: "Unauthorized." });
+  }
+
+  const requestedStatus = String(req.body?.status ?? "");
+
+  if (!allowedStatuses.includes(requestedStatus as (typeof allowedStatuses)[number])) {
+    return res.status(400).json({
+      message: `status must be one of: ${allowedStatuses.join(", ")}.`,
+    });
+  }
+
+  const conversation = await getConversationForSeller(
+    sellerId,
+    String(req.params.id),
+  );
+
+  if (!conversation) {
+    return res.status(404).json({ message: "Conversation not found." });
+  }
+
+  const updatedConversation = await Conversation.findByIdAndUpdate(
+    conversation.id,
+    { status: requestedStatus },
+    { returnDocument: "after" },
+  );
+
+  await pusher?.trigger("inbox", "conversation-updated", updatedConversation);
+
+  return res.json(updatedConversation);
+};

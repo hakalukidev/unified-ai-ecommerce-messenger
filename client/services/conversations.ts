@@ -41,4 +41,12 @@ export const conversationService = {
         ai_enabled: aiEnabled,
       },
     ),
+  updateStatus: (
+    conversationId: string,
+    status: ConversationRecord["status"],
+  ) =>
+    apiClient.patch<ConversationRecord>(
+      `/conversations/${conversationId}/status`,
+      { status },
+    ),
 };

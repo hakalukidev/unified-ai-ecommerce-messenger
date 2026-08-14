@@ -191,6 +191,10 @@ export function useConversations(openedConversationId?: string | null) {
       return conversation.status === "escalated";
     }
 
+    if (filter === "resolved") {
+      return conversation.status === "resolved";
+    }
+
     return conversation.platform === filter;
   });
 

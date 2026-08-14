@@ -8,6 +8,7 @@ import { ConversationItem } from "./ConversationItem";
 const statusFilters: Array<{ key: ConversationFilter; label: string }> = [
   { key: "unread", label: "Unread" },
   { key: "escalated", label: "Escalated" },
+  { key: "resolved", label: "Resolved" },
 ];
 
 const platformTabs: Array<{

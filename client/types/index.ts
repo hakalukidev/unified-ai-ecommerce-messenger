@@ -4,7 +4,12 @@ export type AccountStatus = "active" | "error" | "disconnected";
 
 export type ConversationStatus = "active" | "escalated" | "resolved";
 
-export type ConversationFilter = "all" | "unread" | "escalated" | Platform;
+export type ConversationFilter =
+  | "all"
+  | "unread"
+  | "escalated"
+  | "resolved"
+  | Platform;
 
 export interface SellerSession {
   seller_id: string;

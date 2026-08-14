@@ -5,14 +5,22 @@ import { PlatformBadge } from "@/components/ui/PlatformBadge";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useMessages } from "@/hooks/useMessages";
 import { getInitials } from "@/lib/inbox";
-import type { ConversationRecord, ConversationView } from "@/types";
+import { conversationService } from "@/services/conversations";
+import type {
+  ConversationRecord,
+  ConversationStatus,
+  ConversationView,
+} from "@/types";
 import {
   AlertCircle,
   AlertTriangle,
   ArrowLeft,
   Bot,
   BookOpenText,
+  Check,
+  ChevronDown,
   MessageSquareDashed,
+  RotateCcw,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -39,8 +47,10 @@ export function ThreadView({
     conversation._id,
     conversation.platform,
   );
-  const [showSummary, setShowSummary] = useState(false);
+  const [showSummary, setShowSummary] = useState(true);
   const [togglingAI, setTogglingAI] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -82,6 +92,22 @@ export function ThreadView({
       await onToggleAI(conversation._id, !conversation.ai_enabled);
     } finally {
       setTogglingAI(false);
+    }
+  };
+
+  const handleUpdateStatus = async (status: ConversationStatus) => {
+    setStatusMenuOpen(false);
+    if (status === conversation.status) return;
+
+    setUpdatingStatus(true);
+    try {
+      const updated = await conversationService.updateStatus(
+        conversation._id,
+        status,
+      );
+      onConversationTouched(updated);
+    } finally {
+      setUpdatingStatus(false);
     }
   };
 
@@ -144,6 +170,57 @@ export function ThreadView({
                       : "Enable AI auto-reply for this conversation"
                   }
                 />
+              </div>
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setStatusMenuOpen((current) => !current)}
+                  disabled={updatingStatus}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-70 ${
+                    conversation.status === "resolved"
+                      ? "bg-[var(--color-success)]"
+                      : "bg-[var(--color-accent)] hover:bg-[var(--color-accent-strong)]"
+                  }`}
+                >
+                  {conversation.status === "resolved" ? (
+                    <Check size={14} />
+                  ) : (
+                    <RotateCcw size={14} />
+                  )}
+                  {conversation.status === "resolved" ? "Resolved" : "Resolve"}
+                  <ChevronDown size={14} />
+                </button>
+
+                {statusMenuOpen ? (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setStatusMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 top-full z-20 mt-2 w-44 overflow-hidden rounded-2xl border border-[var(--color-line)] bg-white py-1 shadow-[0_20px_50px_rgba(16,35,58,0.16)]">
+                      {(["active", "escalated", "resolved"] as ConversationStatus[]).map(
+                        (status) => (
+                          <button
+                            key={status}
+                            type="button"
+                            onClick={() => void handleUpdateStatus(status)}
+                            className={`flex w-full items-center justify-between px-4 py-2.5 text-left text-sm capitalize transition hover:bg-[var(--color-surface-soft)] ${
+                              conversation.status === status
+                                ? "font-semibold text-[var(--color-foreground)]"
+                                : "text-[var(--color-muted)]"
+                            }`}
+                          >
+                            {status}
+                            {conversation.status === status ? (
+                              <Check size={14} />
+                            ) : null}
+                          </button>
+                        ),
+                      )}
+                    </div>
+                  </>
+                ) : null}
               </div>
 
               <button
