@@ -34,6 +34,14 @@ export const conversationService = {
     apiClient.post<ReplyResponse>(`/conversations/${conversationId}/reply`, {
       text,
     }),
+  sendAudioReply: (conversationId: string, audio: Blob) => {
+    const form = new FormData();
+    form.append("file", audio, "voice-reply.webm");
+    return apiClient.postForm<ReplyResponse>(
+      `/conversations/${conversationId}/reply-audio`,
+      form,
+    );
+  },
   toggleAI: (conversationId: string, aiEnabled: boolean) =>
     apiClient.patch<ConversationRecord>(
       `/conversations/${conversationId}/ai-toggle`,

@@ -26,6 +26,10 @@ export const getConversationStatusLabel = (status: ConversationStatus) =>
 export const formatRelativeTimestamp = (value: string) =>
   formatDistanceToNow(safeDate(value), { addSuffix: false });
 
+/** Compact date + time for conversation list rows, e.g. "Aug 15, 11:43 AM". */
+export const formatListTimestamp = (value: string) =>
+  format(safeDate(value), "MMM d, h:mm a");
+
 export const formatMessageTime = (value: string) =>
   format(safeDate(value), "h:mm a");
 

@@ -5,10 +5,11 @@ import Conversation from "../models/Conversation";
 import Message from "../models/Message";
 import type { AuthenticatedRequest } from "../middlewares/auth.middleware";
 import pusher from "../lib/pusher";
-import { sendFacebookMessage } from "../services/facebook.service";
+import { sendFacebookAudioMessage, sendFacebookMessage } from "../services/facebook.service";
 import { syncFacebookConversations } from "../services/facebook-sync.service";
-import { sendInstagramMessage } from "../services/instagram.service";
-import { sendWhatsAppMessage } from "../services/whatsapp.service";
+import { sendInstagramAudioMessage, sendInstagramMessage } from "../services/instagram.service";
+import { sendWhatsAppAudioMessage, sendWhatsAppMessage } from "../services/whatsapp.service";
+import { saveAudioReply, toMp3, toOggOpus } from "../services/media.service";
 
 const getSingleQueryValue = (value: unknown) => {
   if (Array.isArray(value)) {
@@ -197,6 +198,109 @@ export const sendReply = async (
     {
       last_message_at: timestamp,
       last_message_preview: text.slice(0, 80),
+    },
+    { returnDocument: "after" },
+  );
+
+  await pusher?.trigger(`conversation-${conversation.id}`, "new-message", message);
+  await pusher?.trigger("inbox", "conversation-updated", updatedConversation);
+
+  return res.status(201).json({
+    message,
+    delivery: deliveryResult.raw,
+  });
+};
+
+export const sendAudioReply = async (
+  req: AuthenticatedRequest & { file?: Express.Multer.File },
+  res: Response,
+) => {
+  const sellerId = req.user?.sellerId;
+
+  if (!sellerId) {
+    return res.status(401).json({ message: "Unauthorized." });
+  }
+
+  if (!req.file?.buffer?.length) {
+    return res.status(400).json({ message: "An audio file is required." });
+  }
+
+  const conversation = await getConversationForSeller(
+    sellerId,
+    String(req.params.id),
+  );
+
+  if (!conversation) {
+    return res.status(404).json({ message: "Conversation not found." });
+  }
+
+  const account = await Account.findById(conversation.account_id);
+
+  if (!account) {
+    return res.status(404).json({ message: "Connected account not found." });
+  }
+
+  let deliveryResult: { messageId?: string; raw: unknown };
+  let attachmentUrl: string;
+
+  try {
+    if (conversation.platform === "whatsapp") {
+      const oggBuffer = await toOggOpus(req.file.buffer);
+      attachmentUrl = saveAudioReply(oggBuffer, "ogg");
+
+      deliveryResult = await sendWhatsAppAudioMessage({
+        accessToken: account.access_token,
+        pageId: account.page_id,
+        recipientId: conversation.sender_id,
+        audioBuffer: oggBuffer,
+      });
+    } else {
+      const mp3Buffer = await toMp3(req.file.buffer);
+      attachmentUrl = saveAudioReply(mp3Buffer, "mp3");
+
+      deliveryResult =
+        conversation.platform === "facebook"
+          ? await sendFacebookAudioMessage({
+              accessToken: account.access_token,
+              pageId: account.page_id,
+              recipientId: conversation.sender_id,
+              audioUrl: attachmentUrl,
+            })
+          : await sendInstagramAudioMessage({
+              accessToken: account.access_token,
+              pageId: account.page_id,
+              recipientId: conversation.sender_id,
+              audioUrl: attachmentUrl,
+            });
+    }
+  } catch (error) {
+    return res.status(502).json({
+      message:
+        error instanceof Error ? error.message : "Failed to send voice reply.",
+    });
+  }
+
+  const timestamp = new Date();
+  const message = await Message.create({
+    conversation_id: conversation.id,
+    platform: conversation.platform,
+    page_id: conversation.page_id,
+    sender_id: conversation.sender_id,
+    sender_name: conversation.sender_name,
+    message_id: deliveryResult.messageId ?? `out-${randomUUID()}`,
+    direction: "outbound",
+    source: "manual",
+    message_type: "audio",
+    message_text: "",
+    attachments: [{ type: "audio", url: attachmentUrl }],
+    timestamp,
+  });
+
+  const updatedConversation = await Conversation.findByIdAndUpdate(
+    conversation.id,
+    {
+      last_message_at: timestamp,
+      last_message_preview: "Voice message",
     },
     { returnDocument: "after" },
   );

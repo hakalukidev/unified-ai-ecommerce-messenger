@@ -10,6 +10,11 @@ export function MessageBubble({ message }: { message: MessageRecord }) {
       (attachment.type === "image" ||
         attachment.mime_type?.startsWith("image/")),
   );
+  const audioAttachment = message.attachments.find(
+    (attachment) =>
+      attachment.url &&
+      (attachment.type === "audio" || attachment.mime_type?.startsWith("audio/")),
+  );
 
   if (message.source === "system") {
     return (
@@ -54,6 +59,15 @@ export function MessageBubble({ message }: { message: MessageRecord }) {
                 className="mb-3 max-h-56 w-full rounded-2xl object-cover"
               />
             </>
+          ) : null}
+
+          {audioAttachment?.url ? (
+            <audio
+              controls
+              preload="metadata"
+              src={audioAttachment.url}
+              className="mb-1 h-10 w-64 max-w-full"
+            />
           ) : null}
 
           {message.message_text ? <p>{message.message_text}</p> : null}

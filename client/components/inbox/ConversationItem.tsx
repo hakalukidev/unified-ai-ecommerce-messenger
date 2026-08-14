@@ -1,16 +1,23 @@
-import { formatRelativeTimestamp } from "@/lib/format";
+import { formatListTimestamp } from "@/lib/format";
 import { getInitials } from "@/lib/inbox";
 import type { ConversationView } from "@/types";
 import { PlatformBadge } from "@/components/ui/PlatformBadge";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { UserRound } from "lucide-react";
 
 interface Props {
   conversation: ConversationView;
   isActive: boolean;
   onClick: () => void;
+  sellerId?: string;
 }
 
-export function ConversationItem({ conversation, isActive, onClick }: Props) {
+export function ConversationItem({
+  conversation,
+  isActive,
+  onClick,
+  sellerId,
+}: Props) {
   return (
     <button
       type="button"
@@ -43,7 +50,7 @@ export function ConversationItem({ conversation, isActive, onClick }: Props) {
               </p>
             </div>
             <span className="shrink-0 text-[11px] text-[var(--color-muted)]">
-              {formatRelativeTimestamp(conversation.last_message_at)}
+              {formatListTimestamp(conversation.last_message_at)}
             </span>
           </div>
 
@@ -56,6 +63,13 @@ export function ConversationItem({ conversation, isActive, onClick }: Props) {
           >
             {conversation.last_message_preview || "No messages yet."}
           </p>
+
+          {sellerId ? (
+            <p className="mt-2 flex items-center gap-1.5 text-[11px] text-[var(--color-muted)]">
+              <UserRound size={11} />
+              Handled by <span className="font-medium">{sellerId}</span>
+            </p>
+          ) : null}
 
           <div className="mt-3 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">

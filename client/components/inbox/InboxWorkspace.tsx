@@ -19,8 +19,10 @@ export function InboxWorkspace({ selectedConversationId }: Props) {
     conversations,
     loading,
     error,
-    filter,
-    setFilter,
+    platformFilter,
+    setPlatformFilter,
+    statusFilter,
+    setStatusFilter,
     refresh,
     applyConversationUpdate,
   } = useConversations(selectedConversationId);
@@ -63,8 +65,10 @@ export function InboxWorkspace({ selectedConversationId }: Props) {
           allConversations={allConversations}
           loading={loading}
           error={error}
-          filter={filter}
-          setFilter={setFilter}
+          platformFilter={platformFilter}
+          setPlatformFilter={setPlatformFilter}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
           activeConversationId={selectedConversationId}
           onSelect={handleSelectConversation}
           onRetry={() => void refresh()}

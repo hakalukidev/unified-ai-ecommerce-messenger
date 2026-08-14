@@ -115,6 +115,27 @@ export function useMessages(
     }
   };
 
+  const sendAudioReply = async (blob: Blob) => {
+    if (!conversationId) {
+      return null;
+    }
+
+    const response = await conversationService.sendAudioReply(
+      conversationId,
+      blob,
+    );
+
+    setMessages((current) => {
+      if (current.some((entry) => entry._id === response.message._id)) {
+        return current;
+      }
+
+      return sortMessages([...current, response.message]);
+    });
+
+    return response.message;
+  };
+
   return {
     messages: conversationId ? messages : [],
     loading: conversationId ? loading : false,
@@ -122,5 +143,6 @@ export function useMessages(
     error: conversationId ? error : null,
     suggestions: buildReplySuggestions(messages, platform),
     sendReply,
+    sendAudioReply,
   };
 }

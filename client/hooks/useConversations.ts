@@ -6,10 +6,11 @@ import { accountService } from "@/services/accounts";
 import { conversationService } from "@/services/conversations";
 import type {
   AccountRecord,
-  ConversationFilter,
   ConversationRecord,
   ConversationView,
   Platform,
+  PlatformFilter,
+  StatusFilter,
 } from "@/types";
 import { useEffect, useEffectEvent, useState } from "react";
 
@@ -75,7 +76,8 @@ export function useConversations(openedConversationId?: string | null) {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<ConversationFilter>("all");
+  const [platformFilter, setPlatformFilter] = useState<PlatformFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   const readInboxData = async () => {
     const [nextAccounts, conversations] = await Promise.all([
@@ -179,23 +181,19 @@ export function useConversations(openedConversationId?: string | null) {
     : allConversations;
 
   const conversations = adjustedConversations.filter((conversation) => {
-    if (filter === "all") {
-      return true;
+    if (platformFilter !== "all" && conversation.platform !== platformFilter) {
+      return false;
     }
 
-    if (filter === "unread") {
+    if (statusFilter === "unread") {
       return conversation.unread_count > 0;
     }
 
-    if (filter === "escalated") {
-      return conversation.status === "escalated";
+    if (statusFilter !== "all") {
+      return conversation.status === statusFilter;
     }
 
-    if (filter === "resolved") {
-      return conversation.status === "resolved";
-    }
-
-    return conversation.platform === filter;
+    return true;
   });
 
   return {
@@ -204,8 +202,10 @@ export function useConversations(openedConversationId?: string | null) {
     conversations,
     loading,
     error,
-    filter,
-    setFilter,
+    platformFilter,
+    setPlatformFilter,
+    statusFilter,
+    setStatusFilter,
     refresh,
     applyConversationUpdate,
   };

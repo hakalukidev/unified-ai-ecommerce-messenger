@@ -43,10 +43,8 @@ export function ThreadView({
   onToggleAI,
   onConversationTouched,
 }: Props) {
-  const { messages, loading, sending, error, suggestions, sendReply } = useMessages(
-    conversation._id,
-    conversation.platform,
-  );
+  const { messages, loading, sending, error, suggestions, sendReply, sendAudioReply } =
+    useMessages(conversation._id, conversation.platform);
   const [showSummary, setShowSummary] = useState(true);
   const [togglingAI, setTogglingAI] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
@@ -86,6 +84,21 @@ export function ThreadView({
       _id: conversation._id,
       last_message_at: message.timestamp,
       last_message_preview: message.message_text,
+      unread_count: 0,
+    });
+  };
+
+  const handleSendAudio = async (blob: Blob) => {
+    const message = await sendAudioReply(blob);
+
+    if (!message) {
+      return;
+    }
+
+    onConversationTouched({
+      _id: conversation._id,
+      last_message_at: message.timestamp,
+      last_message_preview: "Voice message",
       unread_count: 0,
     });
   };
@@ -310,6 +323,7 @@ export function ThreadView({
           sending={sending}
           platform={conversation.platform}
           onSend={handleSend}
+          onSendAudio={handleSendAudio}
         />
       </div>
 
