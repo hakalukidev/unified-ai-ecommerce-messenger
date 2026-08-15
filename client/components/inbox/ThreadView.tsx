@@ -45,7 +45,14 @@ export function ThreadView({
 }: Props) {
   const { messages, loading, sending, error, suggestions, sendReply, sendAudioReply } =
     useMessages(conversation._id, conversation.platform);
-  const [showSummary, setShowSummary] = useState(true);
+  // Persistent 3rd column on desktop, but never auto-opened on mobile — there
+  // it's a full-screen overlay, which was covering the thread the moment any
+  // conversation opened and made everything look overlapped/broken.
+  const [showSummary, setShowSummary] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(min-width: 768px)").matches,
+  );
   const [togglingAI, setTogglingAI] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
@@ -132,49 +139,51 @@ export function ThreadView({
   return (
     <div className="relative flex h-full min-h-0 flex-1 overflow-hidden">
       <div className="flex min-h-0 flex-1 flex-col">
-        <div className="border-b border-[var(--color-line)] bg-[rgba(255,255,255,0.78)] px-4 py-3">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-3">
+        <div className="border-b border-[var(--color-line)] bg-[rgba(255,255,255,0.78)] px-3 py-2.5 md:px-4 md:py-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 md:gap-3">
+            <div className="flex min-w-0 items-center gap-2 md:gap-3">
               <Link
                 href={backHref}
                 aria-label="Back to inbox"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--color-line)] bg-white text-[var(--color-muted)] md:hidden"
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-[var(--color-line)] bg-white text-[var(--color-muted)] md:hidden"
               >
-                <ArrowLeft size={18} />
+                <ArrowLeft size={16} />
               </Link>
 
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[rgba(16,35,58,0.08)] text-sm font-semibold text-[var(--color-foreground)]">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[rgba(16,35,58,0.08)] text-xs font-semibold text-[var(--color-foreground)] md:h-11 md:w-11 md:text-sm">
                 {getInitials(conversation.sender_name)}
               </div>
 
               <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="truncate text-lg font-semibold text-[var(--color-foreground)]">
+                <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
+                  <p className="truncate text-sm font-semibold text-[var(--color-foreground)] md:text-lg">
                     {conversation.sender_name || "Unknown customer"}
                   </p>
                   <StatusBadge status={conversation.status} />
                 </div>
-                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--color-muted)]">
+                <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11px] text-[var(--color-muted)] md:mt-1 md:gap-2 md:text-xs">
                   <PlatformBadge platform={conversation.platform} />
-                  <span>{conversation.page_name}</span>
+                  <span className="truncate">{conversation.page_name}</span>
                   {conversation.page_username ? (
-                    <span>@{conversation.page_username}</span>
+                    <span className="hidden sm:inline">
+                      @{conversation.page_username}
+                    </span>
                   ) : null}
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-white px-3 py-2">
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <div className="flex items-center gap-1.5 rounded-full border border-[var(--color-line)] bg-white px-2 py-1.5 md:gap-2 md:px-3 md:py-2">
                 <Bot
-                  size={14}
+                  size={13}
                   className={
                     conversation.ai_enabled
                       ? "text-[var(--color-accent-strong)]"
                       : "text-[var(--color-muted)]"
                   }
                 />
-                <span className="text-xs font-semibold text-[var(--color-muted)]">
+                <span className="hidden text-xs font-semibold text-[var(--color-muted)] sm:inline">
                   AI
                 </span>
                 <AIToggle
@@ -195,19 +204,21 @@ export function ThreadView({
                   type="button"
                   onClick={() => setStatusMenuOpen((current) => !current)}
                   disabled={updatingStatus}
-                  className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-70 ${
+                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-[11px] font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-70 md:gap-1.5 md:px-3.5 md:py-2 md:text-xs ${
                     conversation.status === "resolved"
                       ? "bg-[var(--color-success)]"
                       : "bg-[var(--color-accent)] hover:bg-[var(--color-accent-strong)]"
                   }`}
                 >
                   {conversation.status === "resolved" ? (
-                    <Check size={14} />
+                    <Check size={13} />
                   ) : (
-                    <RotateCcw size={14} />
+                    <RotateCcw size={13} />
                   )}
-                  {conversation.status === "resolved" ? "Resolved" : "Resolve"}
-                  <ChevronDown size={14} />
+                  <span className="hidden sm:inline">
+                    {conversation.status === "resolved" ? "Resolved" : "Resolve"}
+                  </span>
+                  <ChevronDown size={13} />
                 </button>
 
                 {statusMenuOpen ? (
@@ -244,14 +255,15 @@ export function ThreadView({
               <button
                 type="button"
                 onClick={() => setShowSummary((current) => !current)}
-                className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold transition ${
+                aria-label="Toggle details panel"
+                className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1.5 text-[11px] font-semibold transition md:gap-2 md:px-3 md:py-2 md:text-xs ${
                   showSummary
                     ? "border-[rgba(15,118,110,0.2)] bg-[var(--color-accent-soft)] text-[var(--color-accent-strong)]"
                     : "border-[var(--color-line)] bg-white text-[var(--color-muted)]"
                 }`}
               >
-                <BookOpenText size={14} />
-                Summary
+                <BookOpenText size={13} />
+                <span className="hidden sm:inline">Summary</span>
               </button>
             </div>
           </div>
