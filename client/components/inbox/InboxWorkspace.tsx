@@ -122,7 +122,7 @@ export function InboxWorkspace({ selectedConversationId }: Props) {
         ) : (
           <div className="flex flex-1 items-center justify-center overflow-y-auto px-6 py-10">
             <div className="w-full max-w-xl text-center">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent)] text-white shadow-[0_16px_40px_rgba(15,118,110,0.28)]">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent)] text-white shadow-[0_16px_40px_rgba(217,119,6,0.28)]">
                 <MessageSquareText size={26} />
               </div>
               <p className="mt-5 text-2xl font-semibold text-[var(--color-foreground)]">
@@ -159,7 +159,7 @@ export function InboxWorkspace({ selectedConversationId }: Props) {
                 </div>
 
                 <div className="rounded-[22px] border border-[var(--color-line)] bg-white/70 p-4">
-                  <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[rgba(234,88,12,0.12)] text-[var(--color-warning)]">
+                  <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[rgba(225,29,72,0.12)] text-[var(--color-warning)]">
                     <AlertTriangle size={16} />
                   </div>
                   <p className="mt-3 text-2xl font-semibold text-[var(--color-foreground)]">

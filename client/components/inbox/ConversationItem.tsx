@@ -25,7 +25,7 @@ export function ConversationItem({
       aria-current={isActive ? "true" : undefined}
       className={`animate-fade-in-up w-full min-w-0 max-w-full overflow-hidden rounded-[20px] border px-2.5 py-2.5 text-left transition hover:-translate-y-0.5 ${
         isActive
-          ? "border-[rgba(15,118,110,0.3)] bg-[rgba(15,118,110,0.08)] shadow-sm"
+          ? "border-[rgba(217,119,6,0.3)] bg-[rgba(217,119,6,0.08)] shadow-sm"
           : "border-transparent bg-white/70 hover:border-[var(--color-line)] hover:bg-white hover:shadow-md"
       }`}
     >

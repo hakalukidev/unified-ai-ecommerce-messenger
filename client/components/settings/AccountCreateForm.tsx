@@ -95,7 +95,7 @@ export function AccountCreateForm({ creating, onCreate }: Props) {
               onChange={(event) =>
                 updateField("platform", event.target.value as Platform)
               }
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[rgba(15,118,110,0.12)]"
+              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[rgba(217,119,6,0.12)]"
             >
               {platforms.map((platform) => (
                 <option key={platform} value={platform}>
@@ -114,7 +114,7 @@ export function AccountCreateForm({ creating, onCreate }: Props) {
               onChange={(event) =>
                 updateField("status", event.target.value as AccountStatus)
               }
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[rgba(15,118,110,0.12)]"
+              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[rgba(217,119,6,0.12)]"
             >
               {statuses.map((status) => (
                 <option key={status} value={status}>
@@ -134,7 +134,7 @@ export function AccountCreateForm({ creating, onCreate }: Props) {
             value={form.page_id}
             onChange={(event) => updateField("page_id", event.target.value)}
             placeholder="1234567890"
-            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[rgba(15,118,110,0.12)]"
+            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[rgba(217,119,6,0.12)]"
           />
         </label>
 
@@ -147,7 +147,7 @@ export function AccountCreateForm({ creating, onCreate }: Props) {
             value={form.page_name}
             onChange={(event) => updateField("page_name", event.target.value)}
             placeholder="My Storefront"
-            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[rgba(15,118,110,0.12)]"
+            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[rgba(217,119,6,0.12)]"
           />
         </label>
 
@@ -160,7 +160,7 @@ export function AccountCreateForm({ creating, onCreate }: Props) {
             value={form.page_username}
             onChange={(event) => updateField("page_username", event.target.value)}
             placeholder="@myshop"
-            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[rgba(15,118,110,0.12)]"
+            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[rgba(217,119,6,0.12)]"
           />
         </label>
 
@@ -173,7 +173,7 @@ export function AccountCreateForm({ creating, onCreate }: Props) {
             onChange={(event) => updateField("access_token", event.target.value)}
             rows={4}
             placeholder="Paste the channel access token..."
-            className="w-full rounded-[22px] border border-[var(--color-line)] bg-white px-4 py-3 text-sm text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[rgba(15,118,110,0.12)]"
+            className="w-full rounded-[22px] border border-[var(--color-line)] bg-white px-4 py-3 text-sm text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[rgba(217,119,6,0.12)]"
           />
         </label>
 

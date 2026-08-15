@@ -171,7 +171,7 @@ export function ReplyComposer({
               key={suggestion}
               type="button"
               onClick={() => setText(suggestion)}
-              className="max-w-full rounded-2xl border border-[rgba(15,118,110,0.18)] bg-[var(--color-accent-soft)] px-3 py-1.5 text-left text-xs font-medium leading-5 text-[var(--color-accent-strong)] transition hover:border-[rgba(15,118,110,0.26)]"
+              className="max-w-full rounded-2xl border border-[rgba(217,119,6,0.18)] bg-[var(--color-accent-soft)] px-3 py-1.5 text-left text-xs font-medium leading-5 text-[var(--color-accent-strong)] transition hover:border-[rgba(217,119,6,0.26)]"
             >
               {suggestion}
             </button>
@@ -179,7 +179,7 @@ export function ReplyComposer({
         </div>
       ) : null}
 
-      <div className="flex items-end gap-2 rounded-[26px] border border-[var(--color-line)] bg-white px-2.5 py-2 shadow-[0_16px_40px_rgba(16,35,58,0.08)] transition focus-within:border-[var(--color-accent)] focus-within:ring-4 focus-within:ring-[rgba(15,118,110,0.12)]">
+      <div className="flex items-end gap-2 rounded-[26px] border border-[var(--color-line)] bg-white px-2.5 py-2 shadow-[0_16px_40px_rgba(16,35,58,0.08)] transition focus-within:border-[var(--color-accent)] focus-within:ring-4 focus-within:ring-[rgba(217,119,6,0.12)]">
         <textarea
           ref={textareaRef}
           value={text}
@@ -254,7 +254,7 @@ export function ReplyComposer({
           for a new line
         </span>
         {maxLength ? (
-          <span className={nearLimit ? "font-semibold text-orange-600" : undefined}>
+          <span className={nearLimit ? "font-semibold text-rose-600" : undefined}>
             {text.length}/{maxLength}
           </span>
         ) : null}

@@ -247,7 +247,7 @@ export function ConversationList({
             ))}
           </div>
 
-          <label className="mt-2.5 flex items-center gap-2 rounded-2xl border border-[var(--color-line)] bg-white/80 px-2.5 py-2 transition focus-within:border-[var(--color-accent)] focus-within:ring-4 focus-within:ring-[rgba(15,118,110,0.12)]">
+          <label className="mt-2.5 flex items-center gap-2 rounded-2xl border border-[var(--color-line)] bg-white/80 px-2.5 py-2 transition focus-within:border-[var(--color-accent)] focus-within:ring-4 focus-within:ring-[rgba(217,119,6,0.12)]">
             <Search size={14} className="shrink-0 text-[var(--color-muted)]" />
             <input
               type="search"

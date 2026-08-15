@@ -19,7 +19,7 @@ export function AccountRow({
   onDelete,
 }: Props) {
   return (
-    <div className="grid gap-3 rounded-[24px] border border-[var(--color-line)] bg-white/78 p-4 transition hover:border-[rgba(15,118,110,0.25)] hover:shadow-md md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center">
+    <div className="grid gap-3 rounded-[24px] border border-[var(--color-line)] bg-white/78 p-4 transition hover:border-[rgba(217,119,6,0.25)] hover:shadow-md md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center">
       <div className="flex min-w-0 items-start gap-4">
         <AccountAvatar account={account} />
         <div className="min-w-0">

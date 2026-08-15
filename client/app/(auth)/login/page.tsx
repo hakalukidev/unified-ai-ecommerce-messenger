@@ -168,7 +168,7 @@ export default function LoginPage() {
                     placeholder="Enter your seller ID"
                     aria-invalid={error ? true : undefined}
                     aria-describedby={error ? errorId : undefined}
-                    className="w-full rounded-2xl border border-[var(--color-line)] bg-white py-3 pl-11 pr-4 text-sm text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[rgba(15,118,110,0.12)]"
+                    className="w-full rounded-2xl border border-[var(--color-line)] bg-white py-3 pl-11 pr-4 text-sm text-[var(--color-foreground)] outline-none transition focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[rgba(217,119,6,0.12)]"
                   />
                 </div>
               </label>
@@ -187,7 +187,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={busy}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--color-accent)] px-4 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(15,118,110,0.25)] transition hover:bg-[var(--color-accent-strong)] hover:shadow-[0_12px_34px_rgba(15,118,110,0.32)] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--color-accent)] px-4 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(217,119,6,0.25)] transition hover:bg-[var(--color-accent-strong)] hover:shadow-[0_12px_34px_rgba(217,119,6,0.32)] disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
               >
                 {submitting ? (
                   <>

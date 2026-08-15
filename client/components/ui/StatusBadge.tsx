@@ -2,7 +2,7 @@ type Status = "active" | "escalated" | "resolved" | "error" | "disconnected";
 
 const styles: Record<Status, string> = {
   active: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  escalated: "bg-orange-50 text-orange-700 border-orange-200",
+  escalated: "bg-rose-50 text-rose-700 border-rose-200",
   resolved: "bg-slate-100 text-slate-700 border-slate-200",
   error: "bg-red-50 text-red-700 border-red-200",
   disconnected: "bg-slate-100 text-slate-600 border-slate-200",

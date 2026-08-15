@@ -258,7 +258,7 @@ export function ThreadView({
                 aria-label="Toggle details panel"
                 className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1.5 text-[11px] font-semibold transition md:gap-2 md:px-3 md:py-2 md:text-xs ${
                   showSummary
-                    ? "border-[rgba(15,118,110,0.2)] bg-[var(--color-accent-soft)] text-[var(--color-accent-strong)]"
+                    ? "border-[rgba(217,119,6,0.2)] bg-[var(--color-accent-soft)] text-[var(--color-accent-strong)]"
                     : "border-[var(--color-line)] bg-white text-[var(--color-muted)]"
                 }`}
               >
@@ -270,7 +270,7 @@ export function ThreadView({
         </div>
 
         {conversation.status === "escalated" ? (
-          <div className="flex items-start gap-2 border-b border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-700">
+          <div className="flex items-start gap-2 border-b border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
             <AlertTriangle size={16} className="mt-0.5 shrink-0" />
             <span>
               This thread is escalated, so the customer is waiting for a
