@@ -137,8 +137,8 @@ export function ThreadView({
   };
 
   return (
-    <div className="relative flex h-full min-h-0 flex-1 overflow-hidden">
-      <div className="flex min-h-0 flex-1 flex-col">
+    <div className="relative flex h-full min-h-0 min-w-0 flex-1 overflow-hidden">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <div className="border-b border-[var(--color-line)] bg-[rgba(255,255,255,0.78)] px-3 py-2.5 md:px-4 md:py-3">
           <div className="flex flex-wrap items-center justify-between gap-2 md:gap-3">
             <div className="flex min-w-0 items-center gap-2 md:gap-3">

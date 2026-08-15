@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/hooks/useAuth";
 import { useConversations } from "@/hooks/useConversations";
-import { Bell, LogOut, MessageSquareText, Search, Settings2 } from "lucide-react";
+import { Bell, LogOut, MessageSquareText, Search, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -19,7 +19,7 @@ const navItems = [
   {
     href: "/settings",
     label: "Settings",
-    icon: Settings2,
+    icon: Settings,
     match: (pathname: string) => pathname.startsWith("/settings"),
     badgeKey: null,
   },
@@ -68,7 +68,7 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen">
-      <div className="flex h-screen min-h-0 flex-1 flex-col">
+      <div className="flex h-screen min-h-0 min-w-0 flex-1 flex-col">
         {isConversationDetail ? null : (
           <header className="px-4 pt-4 md:px-6 md:pt-6">
             <div className="glass-panel soft-ring flex items-center justify-between gap-3 rounded-[24px] border border-[var(--color-line)] px-4 py-3">
@@ -132,7 +132,7 @@ export default function DashboardLayout({
         )}
 
         <main
-          className={`flex-1 min-h-0 p-4 md:px-6 md:pb-6 md:pt-4 ${
+          className={`flex-1 min-h-0 min-w-0 p-4 md:px-6 md:pb-6 md:pt-4 ${
             isConversationDetail ? "pt-4" : "pb-24"
           }`}
         >

@@ -171,7 +171,7 @@ export function ReplyComposer({
               key={suggestion}
               type="button"
               onClick={() => setText(suggestion)}
-              className="rounded-full border border-[rgba(15,118,110,0.18)] bg-[var(--color-accent-soft)] px-3 py-1.5 text-left text-xs font-medium text-[var(--color-accent-strong)] transition hover:border-[rgba(15,118,110,0.26)]"
+              className="max-w-full rounded-2xl border border-[rgba(15,118,110,0.18)] bg-[var(--color-accent-soft)] px-3 py-1.5 text-left text-xs font-medium leading-5 text-[var(--color-accent-strong)] transition hover:border-[rgba(15,118,110,0.26)]"
             >
               {suggestion}
             </button>

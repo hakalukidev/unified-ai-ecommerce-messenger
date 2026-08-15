@@ -30,10 +30,10 @@ export function MessageBubble({ message }: { message: MessageRecord }) {
     <div
       className={`animate-fade-in-up mb-4 flex ${isOutbound ? "justify-end" : "justify-start"}`}
     >
-      <div className={`flex max-w-[78%] flex-col gap-1 ${isOutbound ? "items-end" : "items-start"}`}>
+      <div className={`flex max-w-[78%] flex-col gap-0.5 ${isOutbound ? "items-end" : "items-start"}`}>
         {isOutbound ? (
           <span
-            className={`rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${
+            className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] ${
               isAI
                 ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-strong)]"
                 : "bg-emerald-50 text-emerald-700"
@@ -44,7 +44,7 @@ export function MessageBubble({ message }: { message: MessageRecord }) {
         ) : null}
 
         <div
-          className={`rounded-[24px] px-4 py-3 text-sm leading-7 shadow-sm ${
+          className={`rounded-[14px] px-2.5 py-1.5 text-xs leading-5 shadow-sm ${
             isOutbound
               ? "rounded-br-md bg-[var(--color-accent)] text-white"
               : "rounded-bl-md border border-[var(--color-line)] bg-white text-[var(--color-foreground)]"
@@ -56,7 +56,7 @@ export function MessageBubble({ message }: { message: MessageRecord }) {
               <img
                 src={imageAttachment.url}
                 alt={imageAttachment.file_name ?? "Attachment"}
-                className="mb-3 max-h-56 w-full rounded-2xl object-cover"
+                className="mb-1.5 max-h-28 w-full rounded-xl object-cover"
               />
             </>
           ) : null}
@@ -66,14 +66,16 @@ export function MessageBubble({ message }: { message: MessageRecord }) {
               controls
               preload="metadata"
               src={audioAttachment.url}
-              className="mb-1 h-10 w-64 max-w-full"
+              className="mb-0.5 h-8 w-48 max-w-full"
             />
           ) : null}
 
-          {message.message_text ? <p>{message.message_text}</p> : null}
+          {message.message_text ? (
+            <p className="break-words">{message.message_text}</p>
+          ) : null}
         </div>
 
-        <span className="px-1 text-[11px] text-[var(--color-muted)]">
+        <span className="px-1 text-[10px] text-[var(--color-muted)]">
           {formatMessageTime(message.timestamp)}
         </span>
       </div>

@@ -10,19 +10,18 @@ import type {
 import {
   AlertCircle,
   Bot,
-  Camera,
   Inbox,
   LogOut,
-  MessageCircle,
   MessageSquareText,
-  Phone,
   Search,
-  Settings2,
+  Settings,
   X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useDeferredValue, useState } from "react";
+import { ChannelIcon, platformBackground } from "@/components/ui/ChannelIcon";
+import { AccountMenu } from "./AccountMenu";
 import { ConversationItem } from "./ConversationItem";
 
 const navItems = [
@@ -33,12 +32,6 @@ const navItems = [
     match: (pathname: string) =>
       pathname.startsWith("/inbox") || pathname.startsWith("/conversation"),
   },
-  {
-    href: "/settings",
-    label: "Settings",
-    icon: Settings2,
-    match: (pathname: string) => pathname.startsWith("/settings"),
-  },
 ];
 
 const statusTabs: Array<{ key: StatusFilter; label: string }> = [
@@ -48,15 +41,10 @@ const statusTabs: Array<{ key: StatusFilter; label: string }> = [
   { key: "resolved", label: "Resolved" },
 ];
 
-const platformRail: Array<{
-  key: Platform;
-  label: string;
-  dot: string;
-  icon: typeof MessageCircle;
-}> = [
-  { key: "facebook", label: "Messenger", dot: "#1877F2", icon: MessageCircle },
-  { key: "instagram", label: "Instagram", dot: "#E1306C", icon: Camera },
-  { key: "whatsapp", label: "WhatsApp", dot: "#25D366", icon: Phone },
+const platformRail: Array<{ key: Platform; label: string }> = [
+  { key: "facebook", label: "Messenger" },
+  { key: "instagram", label: "Instagram" },
+  { key: "whatsapp", label: "WhatsApp" },
 ];
 
 interface Props {
@@ -150,9 +138,9 @@ export function ConversationList({
               className={`relative inline-flex h-9 w-9 items-center justify-center rounded-2xl text-white transition ${
                 isActive ? "" : "opacity-55 hover:opacity-90"
               }`}
-              style={{ backgroundColor: item.dot }}
+              style={{ background: platformBackground[item.key] }}
             >
-              <item.icon size={15} />
+              <ChannelIcon platform={item.key} size={15} />
               {countFor(item.key) > 0 ? (
                 <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full border border-[var(--color-sidebar)] bg-white px-1 text-[9px] font-bold text-[var(--color-foreground)]">
                   {countFor(item.key) > 99 ? "99+" : countFor(item.key)}
@@ -163,13 +151,25 @@ export function ConversationList({
         })}
 
         <div className="mt-auto flex flex-col items-center gap-2">
-          <button
-            type="button"
-            title={seller?.seller_id ? `Signed in as ${seller.seller_id}` : undefined}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-white/10 text-xs font-semibold text-white"
+          <Link
+            href="/settings"
+            title="Settings"
+            aria-label="Settings"
+            className={`inline-flex h-9 w-9 items-center justify-center rounded-2xl transition ${
+              pathname.startsWith("/settings")
+                ? "bg-[var(--color-accent)] !text-white"
+                : "!text-[var(--color-sidebar-muted)] hover:bg-[var(--color-sidebar-hover)] hover:!text-white"
+            }`}
           >
-            {seller?.seller_id ? seller.seller_id.slice(0, 2).toUpperCase() : "?"}
-          </button>
+            <Settings size={16} />
+          </Link>
+          <AccountMenu
+            sellerId={seller?.seller_id}
+            onLogout={() => {
+              logout();
+              router.replace("/login");
+            }}
+          />
           <button
             type="button"
             onClick={() => {
@@ -185,24 +185,24 @@ export function ConversationList({
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col">
-        <div className="border-b border-[var(--color-line)] px-4 py-4">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--color-accent)] text-white">
-                <Bot size={16} />
+      <div className="flex min-w-0 min-h-0 flex-1 flex-col">
+        <div className="border-b border-[var(--color-line)] px-3 py-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[var(--color-accent)] text-white">
+                <Bot size={14} />
               </div>
-              <div>
-                <h2 className="text-sm font-semibold leading-none text-[var(--color-foreground)]">
+              <div className="min-w-0">
+                <h2 className="truncate text-xs font-semibold leading-none text-[var(--color-foreground)]">
                   Khoroch
                 </h2>
-                <p className="mt-1 text-[10px] font-medium leading-none text-[var(--color-muted)]">
+                <p className="mt-1 truncate text-[9px] font-medium leading-none text-[var(--color-muted)]">
                   Unified Inbox
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1">
               {navItems.map((item) => {
                 const isActive = item.match(pathname);
 
@@ -211,13 +211,13 @@ export function ConversationList({
                     key={item.href}
                     href={item.href}
                     title={item.label}
-                    className={`inline-flex h-8 w-8 items-center justify-center rounded-xl transition ${
+                    className={`inline-flex h-7 w-7 items-center justify-center rounded-xl transition ${
                       isActive
                         ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-strong)]"
                         : "text-[var(--color-muted)] hover:bg-[var(--color-surface-soft)] hover:text-[var(--color-foreground)]"
                     }`}
                   >
-                    <item.icon size={16} />
+                    <item.icon size={14} />
                   </Link>
                 );
               })}
@@ -225,7 +225,7 @@ export function ConversationList({
           </div>
 
           <div
-            className="mt-4 inline-flex flex-wrap items-center gap-1 rounded-full border border-[var(--color-line)] bg-white/70 p-1"
+            className="mt-3 grid w-full grid-cols-4 gap-0.5 rounded-2xl border border-[var(--color-line)] bg-white/70 p-0.5"
             role="tablist"
             aria-label="Filter by status"
           >
@@ -236,7 +236,7 @@ export function ConversationList({
                 role="tab"
                 onClick={() => setStatusFilter(tab.key)}
                 aria-selected={statusFilter === tab.key}
-                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                className={`min-w-0 truncate rounded-full px-0 py-1 text-center text-[8px] font-semibold tracking-tight transition ${
                   statusFilter === tab.key
                     ? "bg-[var(--color-accent)] text-white"
                     : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
@@ -247,15 +247,15 @@ export function ConversationList({
             ))}
           </div>
 
-          <label className="mt-3 flex items-center gap-3 rounded-2xl border border-[var(--color-line)] bg-white/80 px-3 py-2.5 transition focus-within:border-[var(--color-accent)] focus-within:ring-4 focus-within:ring-[rgba(15,118,110,0.12)]">
-            <Search size={16} className="shrink-0 text-[var(--color-muted)]" />
+          <label className="mt-2.5 flex items-center gap-2 rounded-2xl border border-[var(--color-line)] bg-white/80 px-2.5 py-2 transition focus-within:border-[var(--color-accent)] focus-within:ring-4 focus-within:ring-[rgba(15,118,110,0.12)]">
+            <Search size={14} className="shrink-0 text-[var(--color-muted)]" />
             <input
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search sender or message..."
               aria-label="Search conversations"
-              className="w-full bg-transparent text-sm text-[var(--color-foreground)] outline-none placeholder:text-[var(--color-muted)]"
+              className="w-full min-w-0 bg-transparent text-xs text-[var(--color-foreground)] outline-none placeholder:text-[var(--color-muted)]"
             />
             {search ? (
               <button
@@ -264,7 +264,7 @@ export function ConversationList({
                 aria-label="Clear search"
                 className="shrink-0 rounded-full p-0.5 text-[var(--color-muted)] transition hover:text-[var(--color-foreground)]"
               >
-                <X size={14} />
+                <X size={13} />
               </button>
             ) : null}
           </label>
@@ -275,7 +275,7 @@ export function ConversationList({
               setStatusFilter(statusFilter === "unread" ? "all" : "unread")
             }
             aria-pressed={statusFilter === "unread"}
-            className={`mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+            className={`mt-2.5 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold transition ${
               statusFilter === "unread"
                 ? "bg-[var(--color-accent)] text-white"
                 : "border border-[var(--color-line)] bg-white/72 text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
@@ -312,16 +312,16 @@ export function ConversationList({
           ) : null}
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto p-3">
+        <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-2.5">
           {loading ? (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {Array.from({ length: 6 }).map((_, index) => (
                 <div
                   key={index}
-                  className="animate-pulse rounded-[24px] border border-[var(--color-line)] bg-white/80 p-4"
+                  className="animate-pulse rounded-[20px] border border-[var(--color-line)] bg-white/80 p-3.5"
                 >
-                  <div className="flex gap-3">
-                    <div className="h-11 w-11 rounded-2xl bg-[var(--color-surface-soft)]" />
+                  <div className="flex gap-2.5">
+                    <div className="h-10 w-10 rounded-2xl bg-[var(--color-surface-soft)]" />
                     <div className="flex-1">
                       <div className="h-3.5 w-28 rounded bg-[var(--color-surface-soft)]" />
                       <div className="mt-3 h-3 w-full rounded bg-[var(--color-surface-soft)]" />
@@ -332,7 +332,7 @@ export function ConversationList({
               ))}
             </div>
           ) : visibleConversations.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {visibleConversations.map((conversation) => (
                 <ConversationItem
                   key={conversation._id}

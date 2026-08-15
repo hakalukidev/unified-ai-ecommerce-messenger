@@ -182,9 +182,14 @@ export async function maybeAutoReply(
       voice: inbound.wasVoice,
     });
   } catch (error) {
+    const graphError =
+      error && typeof error === "object" && "response" in error
+        ? (error as { response?: { data?: unknown } }).response?.data
+        : undefined;
     log("error", "failed", {
       conversationId: conversation.id,
       error: error instanceof Error ? error.message : String(error),
+      graphError,
     });
   }
 }

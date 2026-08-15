@@ -36,10 +36,15 @@ const syncSellerFacebookAccounts = async (sellerId: string) => {
       try {
         await syncFacebookConversations(account);
       } catch (error) {
+        const graphError =
+          error && typeof error === "object" && "response" in error
+            ? (error as { response?: { data?: unknown } }).response?.data
+            : undefined;
         console.warn(
           `[facebook-sync] failed ${JSON.stringify({
             pageId: account.page_id,
             error: error instanceof Error ? error.message : String(error),
+            graphError,
           })}`,
         );
       }
