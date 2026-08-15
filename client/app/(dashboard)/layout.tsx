@@ -2,14 +2,7 @@
 
 import { useAuth } from "@/hooks/useAuth";
 import { useConversations } from "@/hooks/useConversations";
-import {
-  Bell,
-  Bot,
-  LogOut,
-  MessageSquareText,
-  Search,
-  Settings2,
-} from "lucide-react";
+import { Bell, LogOut, MessageSquareText, Search, Settings2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -75,85 +68,9 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen">
-      <aside className="hidden w-64 shrink-0 p-4 md:block">
-        <div className="flex h-full flex-col rounded-[30px] border border-[var(--color-line)] bg-[var(--color-surface-strong)] px-4 py-6 shadow-[0_20px_60px_rgba(16,35,58,0.08)]">
-          <div className="flex items-center gap-3 px-2">
-            <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--color-accent)] text-white">
-              <Bot size={20} />
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold tracking-tight text-[var(--color-foreground)]">
-                Khoroch
-              </h1>
-              <p className="text-[11px] font-medium text-[var(--color-muted)]">
-                Unified Inbox
-              </p>
-            </div>
-          </div>
-
-          <p className="mt-8 px-3.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-muted)]">
-            Menu
-          </p>
-          <nav className="mt-2 space-y-1.5">
-            {navItems.map((item) => {
-              const isActive = item.match(pathname);
-              const badge = item.badgeKey === "unread" ? unreadCount : 0;
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center justify-between gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium transition ${
-                    isActive
-                      ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-strong)]"
-                      : "text-[var(--color-muted)] hover:bg-[var(--color-surface-soft)] hover:text-[var(--color-foreground)]"
-                  }`}
-                >
-                  <span className="flex items-center gap-3">
-                    <item.icon size={18} />
-                    {item.label}
-                  </span>
-                  {badge > 0 ? (
-                    <span
-                      className={`inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                        isActive
-                          ? "bg-[var(--color-accent)] text-white"
-                          : "bg-[var(--color-surface-soft)] text-[var(--color-muted)]"
-                      }`}
-                    >
-                      {badge > 99 ? "99+" : badge}
-                    </span>
-                  ) : null}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="mt-auto rounded-[22px] border border-[var(--color-line)] bg-[var(--color-surface-soft)] p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-muted)]">
-              Active seller
-            </p>
-            <p className="mt-2 break-all text-sm font-medium text-[var(--color-foreground)]">
-              {seller.seller_id}
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                logout();
-                router.replace("/login");
-              }}
-              className="mt-4 inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-muted)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent-strong)]"
-            >
-              <LogOut size={14} />
-              Log out
-            </button>
-          </div>
-        </div>
-      </aside>
-
       <div className="flex h-screen min-h-0 flex-1 flex-col">
         {isConversationDetail ? null : (
-          <header className="px-4 pt-4 md:px-0 md:pr-6 md:pt-6">
+          <header className="px-4 pt-4 md:px-6 md:pt-6">
             <div className="glass-panel soft-ring flex items-center justify-between gap-3 rounded-[24px] border border-[var(--color-line)] px-4 py-3">
               <div className="min-w-0">
                 <p className="hidden text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)] md:block">
@@ -163,6 +80,16 @@ export default function DashboardLayout({
                   {activeLabel}
                 </h1>
               </div>
+
+              {pathname.startsWith("/settings") ? (
+                <Link
+                  href="/inbox"
+                  className="hidden shrink-0 items-center gap-1.5 rounded-full border border-[var(--color-line)] bg-white px-3.5 py-2 text-xs font-semibold text-[var(--color-muted)] transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent-strong)] md:inline-flex"
+                >
+                  <MessageSquareText size={14} />
+                  Back to inbox
+                </Link>
+              ) : null}
 
               <div className="flex items-center gap-2">
                 <label className="hidden items-center gap-2 rounded-full border border-[var(--color-line)] bg-white px-3.5 py-2 md:flex">
@@ -205,7 +132,7 @@ export default function DashboardLayout({
         )}
 
         <main
-          className={`flex-1 min-h-0 p-4 md:px-0 md:pb-6 md:pr-6 md:pt-4 ${
+          className={`flex-1 min-h-0 p-4 md:px-6 md:pb-6 md:pt-4 ${
             isConversationDetail ? "pt-4" : "pb-24"
           }`}
         >
@@ -217,12 +144,13 @@ export default function DashboardLayout({
             <div className="glass-panel soft-ring mx-auto flex max-w-sm items-center gap-2 rounded-[26px] border border-[var(--color-line)] p-2">
               {navItems.map((item) => {
                 const isActive = item.match(pathname);
+                const badge = item.badgeKey === "unread" ? unreadCount : 0;
 
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex flex-1 flex-col items-center gap-1 rounded-[20px] py-2.5 text-xs font-semibold transition ${
+                    className={`relative flex flex-1 flex-col items-center gap-1 rounded-[20px] py-2.5 text-xs font-semibold transition ${
                       isActive
                         ? "bg-[var(--color-sidebar)] text-white"
                         : "text-[var(--color-muted)] hover:bg-white/70 hover:text-[var(--color-foreground)]"
@@ -230,6 +158,11 @@ export default function DashboardLayout({
                   >
                     <item.icon size={18} />
                     {item.label}
+                    {badge > 0 ? (
+                      <span className="absolute right-6 top-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-accent)] px-1 text-[9px] font-bold text-white">
+                        {badge > 99 ? "99+" : badge}
+                      </span>
+                    ) : null}
                   </Link>
                 );
               })}

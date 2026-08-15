@@ -9,15 +9,37 @@ import type {
 } from "@/types";
 import {
   AlertCircle,
+  Bot,
   Camera,
   Inbox,
+  LogOut,
   MessageCircle,
+  MessageSquareText,
   Phone,
   Search,
+  Settings2,
   X,
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useDeferredValue, useState } from "react";
 import { ConversationItem } from "./ConversationItem";
+
+const navItems = [
+  {
+    href: "/inbox",
+    label: "Inbox",
+    icon: MessageSquareText,
+    match: (pathname: string) =>
+      pathname.startsWith("/inbox") || pathname.startsWith("/conversation"),
+  },
+  {
+    href: "/settings",
+    label: "Settings",
+    icon: Settings2,
+    match: (pathname: string) => pathname.startsWith("/settings"),
+  },
+];
 
 const statusTabs: Array<{ key: StatusFilter; label: string }> = [
   { key: "all", label: "All" },
@@ -64,7 +86,9 @@ export function ConversationList({
   onSelect,
   onRetry,
 }: Props) {
-  const { seller } = useAuth();
+  const { seller, logout } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
   const normalizedSearch = deferredSearch.trim().toLowerCase();
@@ -137,17 +161,67 @@ export function ConversationList({
             </button>
           );
         })}
+
+        <div className="mt-auto flex flex-col items-center gap-2">
+          <button
+            type="button"
+            title={seller?.seller_id ? `Signed in as ${seller.seller_id}` : undefined}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-white/10 text-xs font-semibold text-white"
+          >
+            {seller?.seller_id ? seller.seller_id.slice(0, 2).toUpperCase() : "?"}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              logout();
+              router.replace("/login");
+            }}
+            title="Log out"
+            aria-label="Log out"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-2xl text-[var(--color-sidebar-muted)] transition hover:bg-[var(--color-sidebar-hover)] hover:text-white"
+          >
+            <LogOut size={16} />
+          </button>
+        </div>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="border-b border-[var(--color-line)] px-4 py-4">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold text-[var(--color-foreground)]">
-              All Channel
-            </h2>
-            <span className="text-xs font-semibold text-[var(--color-muted)]">
-              {countFor("all")} total
-            </span>
+            <div className="flex items-center gap-2.5">
+              <div className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--color-accent)] text-white">
+                <Bot size={16} />
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold leading-none text-[var(--color-foreground)]">
+                  Khoroch
+                </h2>
+                <p className="mt-1 text-[10px] font-medium leading-none text-[var(--color-muted)]">
+                  Unified Inbox
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1">
+              {navItems.map((item) => {
+                const isActive = item.match(pathname);
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    title={item.label}
+                    className={`inline-flex h-8 w-8 items-center justify-center rounded-xl transition ${
+                      isActive
+                        ? "bg-[var(--color-accent-soft)] text-[var(--color-accent-strong)]"
+                        : "text-[var(--color-muted)] hover:bg-[var(--color-surface-soft)] hover:text-[var(--color-foreground)]"
+                    }`}
+                  >
+                    <item.icon size={16} />
+                  </Link>
+                );
+              })}
+            </div>
           </div>
 
           <div
