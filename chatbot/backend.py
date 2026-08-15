@@ -55,7 +55,8 @@ SYSTEM_PROMPT = SystemMessage(content=(
     "'kemon acho', 'ki khobor') reply korbe, jate user shohoje bujhte pare. "
     "Jodi user Bangla script e (আসল বাংলা হরফে) lekhe, tahole tumi o Bangla script e "
     "reply korbe. Kokhono khati English e reply dibe na, jodi na user nijei English e "
-    "kotha bole."
+    "kotha bole. Reply shobshomoy ekdom short rakhbe — matro EK-টা sentence e, r "
+    "kono extra explanation ba multiple point dibe na."
 ))
 
 

@@ -24,6 +24,35 @@ interface GraphAttachment {
   [key: string]: unknown;
 }
 
+const getString = (value: unknown): string | undefined =>
+  typeof value === "string" ? value : undefined;
+
+const getNestedUrl = (value: unknown): string | undefined =>
+  value && typeof value === "object" ? getString((value as { url?: unknown }).url) : undefined;
+
+/**
+ * The Conversations API returns attachments shaped nothing like what the
+ * client (and the rest of this app) expects — the media link comes back as
+ * `file_url` (or nested under `image_data`/`video_data`), not `url`. Left
+ * as-is, a synced attachment silently fails to render (the client only
+ * ever looks at `.url`) — an empty bubble with no play button, no image,
+ * nothing. Normalize to the app's `{ type, url, mime_type, file_name }`
+ * shape here, once, so every consumer downstream just works.
+ */
+const normalizeGraphAttachments = (
+  rawAttachments: GraphAttachment[],
+  resolvedType: MessageType,
+) =>
+  rawAttachments.map((attachment) => ({
+    type: resolvedType !== "text" ? resolvedType : getString(attachment.type),
+    url:
+      getString(attachment.file_url) ??
+      getNestedUrl(attachment.image_data) ??
+      getNestedUrl(attachment.video_data),
+    mime_type: getString(attachment.mime_type),
+    file_name: getString(attachment.name),
+  }));
+
 interface GraphMessage {
   id?: string;
   message?: string;
@@ -244,8 +273,9 @@ export const syncFacebookConversations = async (account: AccountDoc) => {
       const direction =
         graphMessage.from?.id === account.page_id ? "outbound" : "inbound";
       const messageText = getMessageText(graphMessage);
-      const attachments = graphMessage.attachments?.data ?? [];
-      const messageType = mapAttachmentType(attachments[0]);
+      const rawAttachments = graphMessage.attachments?.data ?? [];
+      const messageType = mapAttachmentType(rawAttachments[0]);
+      const attachments = normalizeGraphAttachments(rawAttachments, messageType);
 
       const createdMessage = await Message.create({
         conversation_id: conversation.id,
@@ -289,7 +319,10 @@ export const syncFacebookConversations = async (account: AccountDoc) => {
       freshUnansweredInbound &&
       Date.now() - freshUnansweredInbound.timestamp.getTime() < AUTO_REPLY_FRESHNESS_MS
     ) {
-      await maybeAutoReply(conversation, freshUnansweredInbound, account.id);
+      // Don't let one conversation's chatbot+send round trip hold up
+      // syncing the rest of this account's conversations — let it run in
+      // the background (it already logs/handles its own errors).
+      void maybeAutoReply(conversation, freshUnansweredInbound, account.id).catch(() => {});
     }
   }
 };

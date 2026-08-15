@@ -30,7 +30,9 @@ export function MessageBubble({ message }: { message: MessageRecord }) {
     <div
       className={`animate-fade-in-up mb-4 flex ${isOutbound ? "justify-end" : "justify-start"}`}
     >
-      <div className={`flex max-w-[78%] flex-col gap-0.5 ${isOutbound ? "items-end" : "items-start"}`}>
+      <div
+        className={`flex flex-col gap-0.5 ${audioAttachment?.url ? "max-w-[88%]" : "max-w-[78%]"} ${isOutbound ? "items-end" : "items-start"}`}
+      >
         {isOutbound ? (
           <span
             className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] ${
@@ -66,7 +68,7 @@ export function MessageBubble({ message }: { message: MessageRecord }) {
               controls
               preload="metadata"
               src={audioAttachment.url}
-              className="mb-0.5 h-8 w-48 max-w-full"
+              className="mb-0.5 h-8 w-64 max-w-full"
             />
           ) : null}
 

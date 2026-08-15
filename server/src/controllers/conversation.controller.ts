@@ -24,32 +24,53 @@ const getSellerAccountIds = async (sellerId: string) => {
   return accounts.map((account) => account.id);
 };
 
-const syncSellerFacebookAccounts = async (sellerId: string) => {
-  const accounts = await Account.find({
-    seller_id: sellerId,
-    platform: "facebook",
-    status: "active",
-  });
+// Facebook's Graph API (plus, per conversation, potentially a chatbot call
+// and a send-message call for a fresh auto-reply) is slow and sometimes
+// outright fails — awaiting this on every `GET /conversations` made every
+// list load feel sluggish, worse whenever a fresh reply had to go out. It's
+// now fired in the background instead: the request answers immediately
+// from whatever's already in Mongo, and the next poll (the client refreshes
+// every 10s) picks up whatever this run found. A per-seller in-flight guard
+// stops overlapping runs from piling up — and from ever nudging the same
+// unanswered message twice — if requests land faster than a sync finishes.
+const sellerSyncsInFlight = new Set<string>();
 
-  await Promise.all(
-    accounts.map(async (account) => {
-      try {
-        await syncFacebookConversations(account);
-      } catch (error) {
-        const graphError =
-          error && typeof error === "object" && "response" in error
-            ? (error as { response?: { data?: unknown } }).response?.data
-            : undefined;
-        console.warn(
-          `[facebook-sync] failed ${JSON.stringify({
-            pageId: account.page_id,
-            error: error instanceof Error ? error.message : String(error),
-            graphError,
-          })}`,
-        );
-      }
-    }),
-  );
+const syncSellerFacebookAccounts = async (sellerId: string) => {
+  if (sellerSyncsInFlight.has(sellerId)) {
+    return;
+  }
+
+  sellerSyncsInFlight.add(sellerId);
+
+  try {
+    const accounts = await Account.find({
+      seller_id: sellerId,
+      platform: "facebook",
+      status: "active",
+    });
+
+    await Promise.all(
+      accounts.map(async (account) => {
+        try {
+          await syncFacebookConversations(account);
+        } catch (error) {
+          const graphError =
+            error && typeof error === "object" && "response" in error
+              ? (error as { response?: { data?: unknown } }).response?.data
+              : undefined;
+          console.warn(
+            `[facebook-sync] failed ${JSON.stringify({
+              pageId: account.page_id,
+              error: error instanceof Error ? error.message : String(error),
+              graphError,
+            })}`,
+          );
+        }
+      }),
+    );
+  } finally {
+    sellerSyncsInFlight.delete(sellerId);
+  }
 };
 
 const getConversationForSeller = async (
@@ -74,7 +95,9 @@ export const getConversations = async (
     return res.status(401).json({ message: "Unauthorized." });
   }
 
-  await syncSellerFacebookAccounts(sellerId);
+  // Fire-and-forget: don't make the client wait on Facebook's API (and
+  // possibly a chatbot round trip) just to read what's already in Mongo.
+  void syncSellerFacebookAccounts(sellerId).catch(() => {});
 
   const accountIds = await getSellerAccountIds(sellerId);
   const query: Record<string, unknown> = {

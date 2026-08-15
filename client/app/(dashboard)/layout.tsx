@@ -65,6 +65,10 @@ export default function DashboardLayout({
   const activeLabel =
     navItems.find((item) => item.match(pathname))?.label ?? "Workspace";
   const isConversationDetail = pathname.startsWith("/conversation/");
+  // The inbox workspace fills the browser edge-to-edge — no outer padding,
+  // no card frame — instead of sitting inside the padded/rounded shell the
+  // other pages (Settings, etc.) use.
+  const isInboxRoute = isConversationDetail || pathname.startsWith("/inbox");
 
   return (
     <div className="flex h-screen">
@@ -132,9 +136,11 @@ export default function DashboardLayout({
         )}
 
         <main
-          className={`flex-1 min-h-0 min-w-0 p-4 md:px-6 md:pb-6 md:pt-4 ${
-            isConversationDetail ? "pt-4" : "pb-24"
-          }`}
+          className={
+            isInboxRoute
+              ? `flex-1 min-h-0 min-w-0 ${isConversationDetail ? "" : "pb-20 md:pb-0"}`
+              : "flex-1 min-h-0 min-w-0 p-4 pb-24 md:px-6 md:pb-6 md:pt-4"
+          }
         >
           {children}
         </main>

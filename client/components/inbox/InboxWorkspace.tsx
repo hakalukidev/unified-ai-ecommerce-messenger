@@ -54,7 +54,7 @@ export function InboxWorkspace({ selectedConversationId }: Props) {
   };
 
   return (
-    <section className="glass-panel soft-ring flex h-full min-h-[72vh] overflow-hidden rounded-[32px] border border-[var(--color-line)]">
+    <section className="flex h-full min-h-[72vh] overflow-hidden bg-[var(--color-surface-strong)]">
       <div
         className={`min-h-0 w-full shrink-0 md:w-[360px] ${
           selectedConversationId ? "hidden md:block" : "block"

@@ -3,11 +3,11 @@ import Account from "../models/Account";
 import Conversation, { ConversationDocument } from "../models/Conversation";
 import Message, { MessageDocument } from "../models/Message";
 import pusher from "../lib/pusher";
-import { getAIReply, synthesizeSpeech, transcribeAudio } from "./chatbot.service";
-import { downloadFromUrl, downloadWhatsAppMedia, saveAudioReply } from "./media.service";
-import { sendFacebookAudioMessage, sendFacebookMessage } from "./facebook.service";
-import { sendInstagramAudioMessage, sendInstagramMessage } from "./instagram.service";
-import { sendWhatsAppAudioMessage, sendWhatsAppMessage } from "./whatsapp.service";
+import { getAIReply, transcribeAudio } from "./chatbot.service";
+import { downloadFromUrl, downloadWhatsAppMedia } from "./media.service";
+import { sendFacebookMessage } from "./facebook.service";
+import { sendInstagramMessage } from "./instagram.service";
+import { sendWhatsAppMessage } from "./whatsapp.service";
 
 const log = (
   level: "log" | "warn" | "error",
@@ -49,11 +49,11 @@ async function resolveInboundText(
     mimeType = media.mimeType;
     filename = `audio.${mimeType.split("/")[1]?.split(";")[0] ?? "wav"}`;
   } else {
-    // Webhook-delivered attachments carry the URL at `payload.url`; the
-    // same message re-discovered later via the Graph API sync fallback
-    // (see facebook-sync.service.ts) comes back shaped differently, with
-    // the URL at `file_url` instead. Accept either.
-    const url = attachment.payload?.url ?? attachment.file_url;
+    // Webhook-delivered attachments carry the URL at `payload.url`; ones
+    // discovered via the Graph API sync fallback are normalized to `.url`
+    // before they're ever saved (see facebook-sync.service.ts). Accept
+    // either, plus the raw Graph `file_url` as a last-resort fallback.
+    const url = attachment.payload?.url ?? attachment.url ?? attachment.file_url;
     if (!url) return null;
     audioBuffer = await downloadFromUrl(url);
   }
@@ -94,66 +94,34 @@ export async function maybeAutoReply(
 
     const replyText = await getAIReply(conversation.id, inbound.text);
 
-    let deliveryResult: { messageId?: string; raw: unknown };
-    let messageType: MessageDocument["message_type"] = "text";
-    let attachments: unknown[] = [];
+    // Auto-replies always go out as text — even when the customer sent a
+    // voice note — to skip the extra TTS call and keep token/API usage
+    // down. The inbound audio is still transcribed above so the bot
+    // understands it; only the reply format is forced to text.
+    const messageType: MessageDocument["message_type"] = "text";
+    const attachments: unknown[] = [];
 
-    if (inbound.wasVoice) {
-      messageType = "audio";
-
-      if (conversation.platform === "whatsapp") {
-        const audioBuffer = await synthesizeSpeech(replyText, "ogg");
-        attachments = [{ type: "audio", mimeType: "audio/ogg" }];
-
-        deliveryResult = await sendWhatsAppAudioMessage({
-          accessToken: account.access_token,
-          pageId: account.page_id,
-          recipientId: conversation.sender_id,
-          audioBuffer,
-        });
-      } else {
-        const audioBuffer = await synthesizeSpeech(replyText, "wav");
-        const audioUrl = saveAudioReply(audioBuffer);
-        attachments = [{ type: "audio", url: audioUrl }];
-
-        deliveryResult =
-          conversation.platform === "facebook"
-            ? await sendFacebookAudioMessage({
-                accessToken: account.access_token,
-                pageId: account.page_id,
-                recipientId: conversation.sender_id,
-                audioUrl,
-              })
-            : await sendInstagramAudioMessage({
-                accessToken: account.access_token,
-                pageId: account.page_id,
-                recipientId: conversation.sender_id,
-                audioUrl,
-              });
-      }
-    } else {
-      deliveryResult =
-        conversation.platform === "facebook"
-          ? await sendFacebookMessage({
+    const deliveryResult: { messageId?: string; raw: unknown } =
+      conversation.platform === "facebook"
+        ? await sendFacebookMessage({
+            accessToken: account.access_token,
+            pageId: account.page_id,
+            recipientId: conversation.sender_id,
+            text: replyText,
+          })
+        : conversation.platform === "instagram"
+          ? await sendInstagramMessage({
               accessToken: account.access_token,
               pageId: account.page_id,
               recipientId: conversation.sender_id,
               text: replyText,
             })
-          : conversation.platform === "instagram"
-            ? await sendInstagramMessage({
-                accessToken: account.access_token,
-                pageId: account.page_id,
-                recipientId: conversation.sender_id,
-                text: replyText,
-              })
-            : await sendWhatsAppMessage({
-                accessToken: account.access_token,
-                pageId: account.page_id,
-                recipientId: conversation.sender_id,
-                text: replyText,
-              });
-    }
+          : await sendWhatsAppMessage({
+              accessToken: account.access_token,
+              pageId: account.page_id,
+              recipientId: conversation.sender_id,
+              text: replyText,
+            });
 
     const timestamp = new Date();
     const outboundMessage = await Message.create({
