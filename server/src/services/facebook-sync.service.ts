@@ -2,7 +2,20 @@ import axios from "axios";
 import type { HydratedDocument } from "mongoose";
 import type { AccountDocument } from "../models/Account";
 import Conversation from "../models/Conversation";
-import Message, { MessageType } from "../models/Message";
+import Message, { MessageDocument, MessageType } from "../models/Message";
+import { maybeAutoReply } from "./ai-reply.service";
+
+// Real-time Meta webhooks can silently stop delivering in local/dev setups
+// (e.g. a stale ngrok tunnel, or the Webhooks product pointing at an old
+// URL) — messages still show up here because this sync polls the Graph API
+// directly. When that happens the AI would otherwise never see the message
+// (it's normally only triggered from the webhook handler), so if the
+// newest message in a conversation turns out to be a message we just
+// discovered here — inbound, brand new, and not yet answered — nudge the
+// same auto-reply path from here too. Only do this for messages younger
+// than this window so a first-time sync of an old thread doesn't dogpile
+// replies onto historical backlog.
+const AUTO_REPLY_FRESHNESS_MS = 3 * 60 * 1000;
 
 type AccountDoc = HydratedDocument<AccountDocument>;
 
@@ -51,7 +64,27 @@ interface GraphConversationResponse {
 
 const graphVersion = process.env.META_GRAPH_VERSION ?? "v25.0";
 
-const mapAttachmentType = (attachmentType?: string): MessageType => {
+const inferAttachmentTypeFromMime = (mimeType?: string): MessageType | undefined => {
+  if (!mimeType) return undefined;
+  if (mimeType.startsWith("image/")) return "image";
+  if (mimeType.startsWith("audio/")) return "audio";
+  if (mimeType.startsWith("video/")) return "video";
+  return undefined;
+};
+
+/**
+ * The Conversations API doesn't always return a `type` field on message
+ * attachments (it depends on exactly which sub-fields were requested), so
+ * `mime_type` is used as a fallback signal — otherwise voice notes and
+ * other media silently get classified as plain "text" with no content.
+ */
+const mapAttachmentType = (attachment?: GraphAttachment): MessageType => {
+  const attachmentType =
+    (typeof attachment?.type === "string" ? attachment.type : undefined) ??
+    inferAttachmentTypeFromMime(
+      typeof attachment?.mime_type === "string" ? attachment.mime_type : undefined,
+    );
+
   switch (attachmentType) {
     case "image":
     case "audio":
@@ -128,7 +161,7 @@ const fetchFacebookConversations = async (account: AccountDoc) => {
         platform: "messenger",
         limit: 25,
         fields:
-          "id,updated_time,snippet,participants{id,name},messages.limit(20){id,message,from,to,created_time,attachments}",
+          "id,updated_time,snippet,participants{id,name},messages.limit(20){id,message,from,to,created_time,attachments{id,mime_type,name,file_url,image_data,video_data}}",
       },
     },
   );
@@ -194,6 +227,10 @@ export const syncFacebookConversations = async (account: AccountDoc) => {
     );
 
     let newInboundCount = 0;
+    const newlyInsertedInboundByMessageId = new Map<
+      string,
+      HydratedDocument<MessageDocument>
+    >();
 
     for (const graphMessage of graphMessages) {
       const messageId =
@@ -208,9 +245,9 @@ export const syncFacebookConversations = async (account: AccountDoc) => {
         graphMessage.from?.id === account.page_id ? "outbound" : "inbound";
       const messageText = getMessageText(graphMessage);
       const attachments = graphMessage.attachments?.data ?? [];
-      const messageType = mapAttachmentType(attachments[0]?.type);
+      const messageType = mapAttachmentType(attachments[0]);
 
-      await Message.create({
+      const createdMessage = await Message.create({
         conversation_id: conversation.id,
         platform: "facebook",
         page_id: account.page_id,
@@ -227,6 +264,7 @@ export const syncFacebookConversations = async (account: AccountDoc) => {
 
       if (direction === "inbound") {
         newInboundCount += 1;
+        newlyInsertedInboundByMessageId.set(messageId, createdMessage);
       }
     }
 
@@ -234,6 +272,24 @@ export const syncFacebookConversations = async (account: AccountDoc) => {
       await Conversation.findByIdAndUpdate(conversation.id, {
         $inc: { unread_count: newInboundCount },
       });
+    }
+
+    // Only the conversation's overall newest message counts: if that one is
+    // both freshly-discovered and inbound, nobody (agent or bot) has
+    // answered it yet, so it's safe to nudge auto-reply from here.
+    const lastGraphMessage = graphMessages[graphMessages.length - 1];
+    const lastMessageId = lastGraphMessage
+      ? (lastGraphMessage.id ?? getFallbackMessageId(graphConversation.id, lastGraphMessage))
+      : undefined;
+    const freshUnansweredInbound = lastMessageId
+      ? newlyInsertedInboundByMessageId.get(lastMessageId)
+      : undefined;
+
+    if (
+      freshUnansweredInbound &&
+      Date.now() - freshUnansweredInbound.timestamp.getTime() < AUTO_REPLY_FRESHNESS_MS
+    ) {
+      await maybeAutoReply(conversation, freshUnansweredInbound, account.id);
     }
   }
 };

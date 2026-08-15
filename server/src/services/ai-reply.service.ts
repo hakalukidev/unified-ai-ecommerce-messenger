@@ -49,7 +49,11 @@ async function resolveInboundText(
     mimeType = media.mimeType;
     filename = `audio.${mimeType.split("/")[1]?.split(";")[0] ?? "wav"}`;
   } else {
-    const url = attachment.payload?.url;
+    // Webhook-delivered attachments carry the URL at `payload.url`; the
+    // same message re-discovered later via the Graph API sync fallback
+    // (see facebook-sync.service.ts) comes back shaped differently, with
+    // the URL at `file_url` instead. Accept either.
+    const url = attachment.payload?.url ?? attachment.file_url;
     if (!url) return null;
     audioBuffer = await downloadFromUrl(url);
   }
@@ -81,6 +85,9 @@ export async function maybeAutoReply(
       log("log", "skip.unsupported_message_type", {
         conversationId: conversation.id,
         messageType: message.message_type,
+        messageTextLength: message.message_text?.length ?? 0,
+        attachmentCount: message.attachments?.length ?? 0,
+        attachments: message.attachments,
       });
       return;
     }
